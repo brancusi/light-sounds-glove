@@ -1,5 +1,6 @@
 'use strict';
 
+var Rx = require('rxjs/Rx');
 var noble = require('noble');
 var gpio = require("pi-gpio");
 
@@ -15,7 +16,7 @@ var disposable = Rx.Scheduler.default.schedulePeriodic(0, 10, () => gpio.read(16
   //     console.log('bake error');
   //   }
   // });
-  
+
 }));
 
 noble.on('stateChange', function(state) {
