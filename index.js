@@ -43,8 +43,7 @@ function startApp() {
   var isOn = false;
 
   var source = Rx.Observable
-      .interval(10)
-      .timeInterval()
+      .interval(50)
       .map(() => pin.value())
       .distinctUntilChanged();
 
