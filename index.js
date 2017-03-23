@@ -4,7 +4,7 @@ var Rx = require('rxjs/Rx');
 var noble = require('noble');
 var GPIO = require('pi-pins');
 
-var pin = connect(16);
+var pin = GPIO.connect(16);
 pin.mode("in");
 
 var inst = undefined;
