@@ -9,13 +9,27 @@ pin.mode("in");
 
 var inst = undefined;
 
+var isOn = false;
+
 var source = Rx.Observable
-    .interval(500)
-    .timeInterval();
+    .interval(50)
+    .timeInterval()
+    .map(() => pin.value())
+    .distinctUntilChanged();
 
 var subscription = source.subscribe(
-    function (x) {
-      console.log(pin.value());
+    function (isOn) {
+      // console.log(pin.value());
+      if(inst) {
+        var code = isOn ? 1 : 0;
+        var buf = new Buffer(2);
+        buf.writeUInt16BE(code, 0);
+        inst.write(buf, false, function(err) {
+          if (err) {
+            console.log('bake error');
+          }
+        });
+      }
     },
     function (err) {
         console.log('Error: ' + err);
