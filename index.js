@@ -34,7 +34,6 @@ function startApp() {
   console.log("Started App");
   var noble = require('noble');
 
-
   var pin = GPIO.connect(16);
   pin.mode("in");
 
@@ -72,7 +71,7 @@ function startApp() {
     console.log('on -> stateChange: ' + state);
 
     if (state === 'poweredOn') {
-      noble.startScanning();
+      noble.startScanning([], true);
     } else {
       noble.stopScanning();
     }
