@@ -72,7 +72,7 @@ function startApp() {
     console.log('on -> stateChange: ' + state);
 
     if (state === 'poweredOn') {
-      noble.startScanning(["fffffffffffffffffffffffffffffff0"]);
+      noble.startScanning();
     } else {
       noble.stopScanning();
     }
