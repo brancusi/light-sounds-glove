@@ -104,17 +104,16 @@ function startApp() {
 
     peripheral.on('connect', function() {
       console.log('on -> connect');
-      this.updateRssi();
+      // this.updateRssi();
 
       peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
         console.log("Discover services");
-        const service = services.filter(service => service.uuid === "fffffffffffffffffffffffffffffff0")[0];
+        const service = services[0];
 
         if(service) {
-
-          const chars = service.discoverCharacteristics([], (err, characteristics) => {
+          const chars = service.discoverCharacteristics(["fffffffffffffffffffffffffffffff4"], (err, characteristics) => {
             console.log("Setting instance");
-            inst = characteristics.filter(char => char.uuid === "fffffffffffffffffffffffffffffff4")[0];
+            inst = characteristics[0];
           });
         }
 
