@@ -95,7 +95,7 @@ function startApp() {
       console.log('on -> connect');
       this.updateRssi();
 
-      peripheral.discoverServices([], function(err, services){
+      peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
         console.log("Discover services");
         const service = services.filter(service => service.uuid === "fffffffffffffffffffffffffffffff0")[0];
         const chars = service.discoverCharacteristics([], (err, characteristics) => {
