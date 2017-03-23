@@ -6,18 +6,31 @@ var gpio = require("pi-gpio");
 
 var inst = undefined;
 
-var disposable = Rx.Scheduler.default.schedulePeriodic(0, 10, () => gpio.read(16, (err, value) => {
-  console.log(value);
+var source = Rx.Observable
+    .interval(500)
+    .timeInterval();
 
-  // var temperature = new Buffer(2);
-  // temperature.writeUInt16BE(450, 0);
-  // write.write(temperature, false, function(err) {
-  //   if (err) {
-  //     console.log('bake error');
-  //   }
-  // });
+var subscription = source.subscribe(
+    function (x) {
+        gpio.read(16, (err, value) => {
+          console.log(value);
 
-}));
+          // var temperature = new Buffer(2);
+          // temperature.writeUInt16BE(450, 0);
+          // write.write(temperature, false, function(err) {
+          //   if (err) {
+          //     console.log('bake error');
+          //   }
+          // });
+
+        })
+    },
+    function (err) {
+        console.log('Error: ' + err);
+    },
+    function () {
+        console.log('Completed');
+    });
 
 noble.on('stateChange', function(state) {
   console.log('on -> stateChange: ' + state);
