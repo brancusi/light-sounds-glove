@@ -2,7 +2,10 @@
 
 var Rx = require('rxjs/Rx');
 var noble = require('noble');
-var gpio = require("pi-gpio");
+var GPIO = require('pi-pins');
+
+var pin = connect(16);
+pin.mode("in");
 
 var inst = undefined;
 
@@ -12,20 +15,7 @@ var source = Rx.Observable
 
 var subscription = source.subscribe(
     function (x) {
-        gpio.open(16, "input", function(err) {		// Open pin 16 for output
-        	gpio.read(16, (err, value) => {
-            console.log(value);
-
-            // var temperature = new Buffer(2);
-            // temperature.writeUInt16BE(450, 0);
-            // write.write(temperature, false, function(err) {
-            //   if (err) {
-            //     console.log('bake error');
-            //   }
-            // });
-
-          })
-        });
+      console.log(pin.value());
     },
     function (err) {
         console.log('Error: ' + err);
