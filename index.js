@@ -46,7 +46,7 @@ function startApp() {
       .map(() => pin.value())
       .distinctUntilChanged();
 
-  var subscription = source.subscribe(
+  var readSub = source.subscribe(
       function (isOn) {
         console.log(isOn);
         if(inst) {
@@ -71,7 +71,19 @@ function startApp() {
     console.log('on -> stateChange: ' + state);
 
     if (state === 'poweredOn') {
-      noble.startScanning([], true);
+      // noble.startScanning([], true);
+      Rx.Observable
+        .interval(5000)
+        .subscribe(
+          function () {
+            noble.startScanning([], true);
+          },
+          function (err) {
+              console.log('Error: ' + err);
+          },
+          function () {
+              console.log('Completed');
+          });
     } else {
       noble.stopScanning();
     }
