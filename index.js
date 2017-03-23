@@ -73,10 +73,10 @@ function startApp() {
     if (state === 'poweredOn') {
       // noble.startScanning([], true);
       Rx.Observable
-        .interval(5000)
+        .interval(10000)
         .subscribe(
           function () {
-            noble.startScanning([], true);
+            noble.startScanning(["fffffffffffffffffffffffffffffff0"]);
           },
           function (err) {
               console.log('Error: ' + err);
