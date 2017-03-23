@@ -12,18 +12,20 @@ var source = Rx.Observable
 
 var subscription = source.subscribe(
     function (x) {
-        gpio.read(16, (err, value) => {
-          console.log(value);
+        gpio.open(16, "input", function(err) {		// Open pin 16 for output
+        	gpio.read(16, (err, value) => {
+            console.log(value);
 
-          // var temperature = new Buffer(2);
-          // temperature.writeUInt16BE(450, 0);
-          // write.write(temperature, false, function(err) {
-          //   if (err) {
-          //     console.log('bake error');
-          //   }
-          // });
+            // var temperature = new Buffer(2);
+            // temperature.writeUInt16BE(450, 0);
+            // write.write(temperature, false, function(err) {
+            //   if (err) {
+            //     console.log('bake error');
+            //   }
+            // });
 
-        })
+          })
+        });
     },
     function (err) {
         console.log('Error: ' + err);
