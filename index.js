@@ -19,7 +19,7 @@ var source = Rx.Observable
 
 var subscription = source.subscribe(
     function (isOn) {
-      // console.log(pin.value());
+      console.log(isOn);
       if(inst) {
         var code = isOn ? 1 : 0;
         var buf = new Buffer(2);
