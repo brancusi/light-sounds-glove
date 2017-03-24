@@ -54,7 +54,7 @@ function startApp() {
   const subs = all
     .map(id =>
       Rx.Observable
-        .interval(50)
+        .interval(1000)
         .map(() => {
           console.log("Going to pull value for", id, PIN_MAP[id].value());
           return PIN_MAP[id].value();
