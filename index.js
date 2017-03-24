@@ -57,7 +57,7 @@ function startApp() {
         .interval(200)
         .map(() => {
           const hey = PIN_MAP[id].value();
-          console.log(hey);
+          console.log(PIN_MAP.toJS(), id, hey);
           return hey;
         })
         .map(val => val ? "1" : "0")
