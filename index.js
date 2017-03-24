@@ -55,6 +55,7 @@ function startApp() {
     .map(id => {
       return Rx.Observable
         .interval(50)
+        .do(() => console.log("Pin", id, PIN_MAP[id].value()))
         .map(() => PIN_MAP[id].value())
         .map(val => val ? "1" : "0")
         .distinctUntilChanged()
@@ -100,11 +101,16 @@ function startApp() {
 
 function connectPeripheral(ids, peripheral) {
   console.log("Connect to ids", ids);
-  peripheral.connect((err) => handleConnectedPeripheral(err, ids, peripheral) );
+  peripheral.connect(err => {
+    if(err) {
+      console.log("Error connecting to device", err, ids);
+    } else {
+      handleConnectedPeripheral(ids, peripheral)
+    }
+  } );
 }
 
-function handleConnectedPeripheral(err, ids, peripheral) {
-  if(err === undefined) {
+function handleConnectedPeripheral(ids, peripheral) {
     connected = connected.concat(ids);
 
     peripheral.discoverServices(ids, (err, services) => {
@@ -116,8 +122,6 @@ function handleConnectedPeripheral(err, ids, peripheral) {
         });
       }
     });
-  } else {
-    console.log("Error connecting to", ids, err);
   }
 }
 
