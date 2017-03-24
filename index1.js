@@ -1,7 +1,9 @@
-var Sound = require('aplay');
+var spawn = require('child_process').spawn;
+
+// var Sound = require('aplay');
 
 // with ability to pause/resume:
-var music = new Sound();
+// var music = new Sound();
 // music.play('foo1.mp3');
 
 // setTimeout(function () {
@@ -21,6 +23,7 @@ var music = new Sound();
 // var player = new Player('./foo1.mp3');
 //
 var stdin = process.stdin;
+var playback = undefined;
 
 // without this, we would only get streams once enter is pressed
 stdin.setRawMode( true );
@@ -35,11 +38,14 @@ stdin.setEncoding( 'utf8' );
 // on any data into stdin
 stdin.on( 'data', function( key ){
   if(key === 'a') {
-    music.play('foo1.mp3');
+
+    playback = spawn('mpg123', ['foo1.mp3']);
+    // music.play('foo1.mp3');
   }
 
   if(key === 's') {
-    music.pause();
+    // music.pause();
+    playback.kill();
   }
 
   // ctrl-c ( end of text )

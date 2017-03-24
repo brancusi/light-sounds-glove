@@ -8,9 +8,6 @@ var GPIO = require('pi-pins');
 var exec = require('child_process').exec;
 var util = require('util');
 
-const all = ["fffffffffffffffffffffffffffffff0"];
-const connected = new Set();
-
 function startBluetooth() {
   console.log("Starting bluetooth");
   exec("/usr/bin/hciattach /dev/ttyAMA0 bcm43xx 921600 noflow -", function(err, stdout){
@@ -76,19 +73,7 @@ function startApp() {
     console.log('on -> stateChange: ' + state);
 
     if (state === 'poweredOn') {
-      noble.startScanning([], true);
-      // Rx.Observable
-      //   .interval(10000)
-      //   .subscribe(
-      //     function () {
-      //       noble.startScanning(R.difference(all, [...connected]));
-      //     },
-      //     function (err) {
-      //         console.log('Error: ' + err);
-      //     },
-      //     function () {
-      //         console.log('Completed');
-      //     });
+      noble.startScanning(["fffffffffffffffffffffffffffffff0"], true);
     } else {
       noble.stopScanning();
     }
@@ -112,8 +97,6 @@ function startApp() {
       peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
         console.log("Discover services");
         const service = services[0];
-        const uuid = service.uuid;
-        connected.add(uuid);
 
         if(service) {
           const chars = service.discoverCharacteristics(["fffffffffffffffffffffffffffffff4"], (err, characteristics) => {
