@@ -107,22 +107,21 @@ function connectPeripheral(ids, peripheral) {
     } else {
       handleConnectedPeripheral(ids, peripheral)
     }
-  } );
+  });
 }
 
 function handleConnectedPeripheral(ids, peripheral) {
-    connected = connected.concat(ids);
+  connected = connected.concat(ids);
 
-    peripheral.discoverServices(ids, (err, services) => {
-      const service = services[0];
+  peripheral.discoverServices(ids, (err, services) => {
+    const service = services[0];
 
-      if(service) {
-        const chars = service.discoverCharacteristics(["fff1"], (err, characteristics) => {
-          devices = devices.set(ids[0], characteristics[0]);
-        });
-      }
-    });
-  }
+    if(service) {
+      const chars = service.discoverCharacteristics(["fff1"], (err, characteristics) => {
+        devices = devices.set(ids[0], characteristics[0]);
+      });
+    }
+  });
 }
 
 startBluetooth();
