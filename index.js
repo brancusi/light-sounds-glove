@@ -55,10 +55,7 @@ function startApp() {
     .map(id =>
       Rx.Observable
         .interval(1000)
-        .map(() => {
-          console.log("Going to pull value for", id, PIN_MAP[id].value());
-          return PIN_MAP[id].value();
-        })
+        .map(() => PIN_MAP[id].value())
         .map(val => val ? "1" : "0")
         .distinctUntilChanged()
         .map(pinVal => {
