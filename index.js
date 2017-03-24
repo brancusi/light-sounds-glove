@@ -20,11 +20,20 @@ const DEVICE_PIN_MAP = {
 }
 
 R.forEachObjIndexed((val, key) => {
-  const pin = GPIO.export(val, {direction: "in"});
+  const pin = GPIO.export(val, {
+    direction: "in",
+    ready: () => {
+      console.log("Ready", val, key);
+    },
+
+    change: (state) => {
+      console.log("!!!!! ", state);
+    }
+  });
 
   console.log("Setting up pin", key, val);
 
-  pin.on("change", function(state) {
+  pin.on("change", state => {
     console.log("Changed", key, val, state);
     const device = devices.get(key);
 
