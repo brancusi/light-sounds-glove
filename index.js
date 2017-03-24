@@ -52,13 +52,13 @@ function startApp() {
   const noble = require('noble');
 
   const subs = all
-    .map(id => {
-      return Rx.Observable
+    .map(id =>
+      Rx.Observable
         .interval(50)
         .map(() => PIN_MAP[id].value())
         .map(val => val ? "1" : "0")
         .distinctUntilChanged()
-        .do(val => console.log("Pin", id, val)
+        .do(val => console.log("Pin", id, val))
         .map(pinVal => {
           return {
             id,
@@ -66,8 +66,7 @@ function startApp() {
             buffer: new Buffer(pinVal)
           }
         })
-        .filter(state => state.device !== undefined)
-    })
+        .filter(state => state.device !== undefined))
     .map(source => source.subscribe(state => {
       console.log("Is device defined", state.device);
       console.log("Going to write to", state.id, state.buffer.toString());
