@@ -68,7 +68,6 @@ function startApp() {
         })
         .filter(state => state.device !== undefined))
     .map(source => source.subscribe(state => {
-      console.log("Is device defined", state.device);
       console.log("Going to write to", state.id, state.buffer.toString());
       state.device.write(state.buffer, true, err => {
         if(err) {
@@ -116,6 +115,7 @@ function connectPeripheral(ids, peripheral) {
 
 function handleConnectedPeripheral(ids, peripheral) {
   connected = connected.concat(ids);
+  console.log(connected.toJS());
 
   peripheral.discoverServices(ids, (err, services) => {
     const service = services[0];
