@@ -1,7 +1,7 @@
 'use strict';
 
 const R = require('ramda');
-const { Set } = require('immutable');
+const { Map, Set } = require('immutable');
 
 var Rx = require('rxjs/Rx');
 var GPIO = require('pi-pins');
@@ -9,8 +9,20 @@ var GPIO = require('pi-pins');
 var exec = require('child_process').exec;
 var util = require('util');
 
-const all = Set(["fffffffffffffffffffffffffffffff0"]);
+const all = Set(["fff0"]);
 let connected = Set();
+let devices = Map();
+
+const device1 = GPIO.connect(14);
+device1.mode("in");
+
+const device2 = GPIO.connect(15);
+device2.mode("in");
+
+const device3 = GPIO.connect(18);
+device3.mode("in");
+
+const PIN_MAP = {"fff0": device1, "fff1": device2, "fff2": device3};
 
 function startBluetooth() {
   console.log("Starting bluetooth");
@@ -37,99 +49,74 @@ function startRadio() {
 }
 
 function startApp() {
-  console.log("Started App");
-  var noble = require('noble');
+  const noble = require('noble');
 
-  var pin = GPIO.connect(16);
-  pin.mode("in");
-
-  var inst = undefined;
-
-  var isOn = false;
-
-  var source = Rx.Observable
-      .interval(50)
-      .map(() => pin.value())
-      .distinctUntilChanged();
-
-  var readSub = source.subscribe(
-      function (isOn) {
-        console.log(isOn);
-        if(inst) {
-          var code = isOn ? 1 : 0;
-          var buf = new Buffer(2);
-          buf.writeUInt16BE(code, 0);
-          inst.write(buf, false, function(err) {
-            if (err) {
-              console.log('bake error');
-            }
+  const subs = all
+    .map(id => {
+      return Rx.Observable
+        .interval(50)
+        .map(() => PIN_MAP[id].value())
+        .distinctUntilChanged();
+        .map(pinVal => {
+          return {
+            device: devices.get(id),
+            pinVal
+          }
+        })
+        .filter(state => state.device !== undefined)
+    })
+    .map(source => {
+      return source
+        .subscribe(state => {
+            var code = state.pinVal ? "1" : "0";
+            state.device.write(new Buffer("1"), false, () => {});
           });
-        }
-      },
-      function (err) {
-          console.log('Error: ' + err);
-      },
-      function () {
-          console.log('Completed');
-      });
+    });
 
   noble.on('stateChange', function(state) {
-    console.log('on -> stateChange: ' + state);
-
     if (state === 'poweredOn') {
-      // noble.startScanning(["fffffffffffffffffffffffffffffff0"], true);
-
       Rx.Observable
         .interval(10000)
+        .startWith(0)
         .map(() => all.subtract(connected))
         .filter(keys => !keys.isEmpty())
         .map(keys => keys.toJS())
-        .do(keys => console.log(keys))
-        .subscribe(jsKeys => noble.startScanning(jsKeys, true));
+        .do(keys => console.log("Going to scan for ", keys))
+        .subscribe(jsKeys => noble.startScanning(jsKeys));
     } else {
       noble.stopScanning();
     }
   });
 
-  noble.on('scanStart', function() {
-    console.log('on -> scanStart');
-  });
+  noble.on('discover', peripheral => {
+    const uuids = peripheral.advertisement.serviceUuids
 
-  noble.on('scanStop', function() {
-    console.log('on -> scanStop');
-  });
+    connectPeripheral(peripheral.advertisement.serviceUuids, peripheral);
 
-  noble.on('discover', function(peripheral) {
-    console.log('on -> discover: ' + peripheral);
-
-    peripheral.on('connect', function() {
-
-      connected = connected.concat(peripheral.advertisement.serviceUuids);
-
-      peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
-        console.log("Discover services");
-        const service = services[0];
-
-        console.log("Service", service);
-
-        if(service) {
-          const chars = service.discoverCharacteristics(["fffffffffffffffffffffffffffffff4"], (err, characteristics) => {
-            inst = characteristics[0];
-            console.log("Setting instance", inst);
-          });
-        }
-      });
-
+    peripheral.on('disconnect', () => {
+      connected = connected.subtract(uuids);
     });
-
-    peripheral.on('disconnect', function() {
-      connected = connected.subtract(peripheral.advertisement.serviceUuids);
-
-      console.log("disconnected", peripheral);
-    });
-
-    peripheral.connect();
   });
+}
+
+function connectPeripheral(ids, peripheral) {
+  peripheral.connect((err) => handleConnectedPeripheral(err, ids, peripheral) );
+}
+
+function handleConnectedPeripheral(err, ids, peripheral) {
+  if(err === undefined) {
+    connected = connected.concat(ids);
+
+    peripheral.discoverServices(ids, (err, services) => {
+      const service = services[0];
+
+      if(service) {
+        const chars = service.discoverCharacteristics(["fff1"], (err, characteristics) => {
+          devices = devices.set(ids[0], characteristics[0]);
+        });
+      }
+    });
+  }
 }
 
 startBluetooth();
