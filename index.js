@@ -104,7 +104,7 @@ function startApp() {
 
     peripheral.on('connect', function() {
 
-      connected = connected.concat(peripheral.advertisment.serviceUuids);
+      connected = connected.concat(peripheral.advertisement.serviceUuids);
 
       peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
         console.log("Discover services");
@@ -123,7 +123,7 @@ function startApp() {
     });
 
     peripheral.on('disconnect', function() {
-      connected = connected.subtract(peripheral.advertisment.serviceUuids);
+      connected = connected.subtract(peripheral.advertisement.serviceUuids);
 
       console.log("disconnected", peripheral);
     });
