@@ -56,7 +56,7 @@ function startApp() {
       return Rx.Observable
         .interval(50)
         .map(() => PIN_MAP[id].value())
-        .map(pinState => state.pinVal ? "1" : "0")
+        .map(val => val ? "1" : "0")
         .distinctUntilChanged()
         .map(pinVal => {
           return {
