@@ -7,7 +7,7 @@ WORKDIR $APP_BASE
 # Install image tools
 RUN apt-get update && apt-get install -y \
   bluetooth bluez bluez-firmware libbluetooth-dev libudev-dev \
-  alsa-utils libasound2-dev mpg321 \
+  alsa-utils libasound2-dev mpg123 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY package.json $APP_BASE/

@@ -1,88 +1,51 @@
-'use strict';
+var Sound = require('aplay');
 
-var Rx = require('rxjs/Rx');
-// var GPIO = require('pi-pins');
+// with ability to pause/resume:
+var music = new Sound();
+// music.play('foo1.mp3');
 
-// var exec = require('child_process').exec;
-var util = require('util');
+// setTimeout(function () {
+// 	music.pause(); // pause the music after five seconds
+// }, 5000);
+//
+// setTimeout(function () {
+//   music.resume(); // and resume it two seconds after pausing
+// }, 7000);
+//
+// // you can also listen for various callbacks:
+// music.on('complete' function () {
+//   console.log('Done with playback!');
+// });
 
-var noble = require('noble');
+// var Player = require('player');
+// var player = new Player('./foo1.mp3');
+//
+var stdin = process.stdin;
 
-var inst = undefined;
+// without this, we would only get streams once enter is pressed
+stdin.setRawMode( true );
 
-var isOn = false;
+// resume stdin in the parent process (node app won't quit all by itself
+// unless an error or process.exit() happens)
+stdin.resume();
 
-// var source = Rx.Observable
-//     .interval(50)
-//     .map(() => pin.value())
-//     .distinctUntilChanged();
+// i don't want binary, do you?
+stdin.setEncoding( 'utf8' );
 
-// var subscription = source.subscribe(
-//     function (isOn) {
-//       console.log(isOn);
-//       if(inst) {
-//         var code = isOn ? 1 : 0;
-//         var buf = new Buffer(2);
-//         buf.writeUInt16BE(code, 0);
-//         inst.write(buf, false, function(err) {
-//           if (err) {
-//             console.log('bake error');
-//           }
-//         });
-//       }
-//     },
-//     function (err) {
-//         console.log('Error: ' + err);
-//     },
-//     function () {
-//         console.log('Completed');
-//     });
-
-noble.on('stateChange', function(state) {
-  console.log('on -> stateChange: ' + state);
-
-  if (state === 'poweredOn') {
-    noble.startScanning();
-  } else {
-    noble.stopScanning();
+// on any data into stdin
+stdin.on( 'data', function( key ){
+  if(key === 'a') {
+    music.play('foo1.mp3');
   }
-});
 
-noble.on('scanStart', function() {
-  console.log('on -> scanStart');
-});
+  if(key === 's') {
+    music.pause();
+  }
 
-noble.on('scanStop', function() {
-  console.log('on -> scanStop');
-});
-
-noble.on('discover', function(peripheral) {
-  console.log('on -> discover: ' + peripheral);
-
-  // noble.stopScanning();
-
-  peripheral.on('connect', function() {
-    console.log('on -> connect');
-    this.updateRssi();
-
-    peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
-      console.log("Discover services");
-      const service = services.filter(service => service.uuid === "fffffffffffffffffffffffffffffff0")[0];
-      if(service) {
-        const chars = service.discoverCharacteristics([], (err, characteristics) => {
-          inst = characteristics.filter(char => char.uuid === "fffffffffffffffffffffffffffffff4")[0];
-          var buf = new Buffer(2);
-          buf.writeUInt16BE(1, 0);
-          inst.write(buf, false, function(err) {
-            if (err) {
-              console.log('bake error');
-            }
-          });
-        });
-      }
-
-    })
-  });
-
-  peripheral.connect();
+  // ctrl-c ( end of text )
+  if ( key === '\u0003' ) {
+    process.exit();
+  }
+  // write the key to stdout all normal like
+  process.stdout.write( key );
 });

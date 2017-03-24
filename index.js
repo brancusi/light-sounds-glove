@@ -76,19 +76,19 @@ function startApp() {
     console.log('on -> stateChange: ' + state);
 
     if (state === 'poweredOn') {
-      // noble.startScanning([], true);
-      Rx.Observable
-        .interval(10000)
-        .subscribe(
-          function () {
-            noble.startScanning(R.difference(all, [...connected]));
-          },
-          function (err) {
-              console.log('Error: ' + err);
-          },
-          function () {
-              console.log('Completed');
-          });
+      noble.startScanning([], true);
+      // Rx.Observable
+      //   .interval(10000)
+      //   .subscribe(
+      //     function () {
+      //       noble.startScanning(R.difference(all, [...connected]));
+      //     },
+      //     function (err) {
+      //         console.log('Error: ' + err);
+      //     },
+      //     function () {
+      //         console.log('Completed');
+      //     });
     } else {
       noble.stopScanning();
     }
