@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "gpio": "^0.2.7",
     "immutable": "^3.8.1",
-    "noble": "^1.8.0",
     "pi-pins": "^1.0.2",
     "ramda": "^0.23.0",
     "rxjs": "^5.2.0"

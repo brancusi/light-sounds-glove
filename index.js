@@ -4,7 +4,11 @@ const R = require('ramda');
 const { Map, Set } = require('immutable');
 
 var Rx = require('rxjs/Rx');
-var GPIO = require('pi-pins');
+var GPIO = require("gpio");
+
+const device1 = GPIO.export(14, {direction: "in"});
+const device2 = GPIO.export(15, {direction: "in"});
+const device3 = GPIO.export(18, {direction: "in"});
 
 var exec = require('child_process').exec;
 var util = require('util');
@@ -13,16 +17,28 @@ const all = Set(["fff0", "fff1", "fff2"]);
 let connected = Set();
 let devices = Map();
 
-const device1 = GPIO.connect(14);
-device1.mode("in");
+// const device1 = GPIO.connect(14);
+// device1.mode("in");
+//
+// const device2 = GPIO.connect(15);
+// device2.mode("in");
+//
+// const device3 = GPIO.connect(18);
+// device3.mode("in");
 
-const device2 = GPIO.connect(15);
-device2.mode("in");
+// const PIN_MAP = {"fff0": device1, "fff1": device2, "fff2": device3};
 
-const device3 = GPIO.connect(18);
-device3.mode("in");
+device1.on("change", function(val) {
+  triggerDevice("fff0", val);
+});
 
-const PIN_MAP = {"fff0": device1, "fff1": device2, "fff2": device3};
+function triggerDevice(id, state) {
+  const device = devices.get(id);
+
+  if(device) {
+    device.write(new Buffer(String(state)), true, err => ());
+  }
+}
 
 function startBluetooth() {
   console.log("Starting bluetooth");
@@ -51,34 +67,34 @@ function startRadio() {
 function startApp() {
   const noble = require('noble');
 
-  const subs = all
-    .map(id =>
-      Rx.Observable
-        .interval(200)
-        .map(() => {
-          const hey = PIN_MAP[id].value();
-          console.log(PIN_MAP, id, hey);
-          return hey;
-        })
-        .map(val => val ? "1" : "0")
-        .distinctUntilChanged()
-        .map(pinVal => {
-          console.log("Pin", id, pinVal);
-          return {
-            id,
-            device: devices.get(id),
-            buffer: new Buffer(pinVal)
-          }
-        })
-        .filter(state => state.device !== undefined))
-    .map(source => source.subscribe(state => {
-      console.log("Going to write to", state.id, state.buffer.toString());
-      state.device.write(state.buffer, true, err => {
-        if(err) {
-          console.log("Error writing to device", state.id, err)
-        }
-      });
-    }));
+  // const subs = all
+  //   .map(id =>
+  //     Rx.Observable
+  //       .interval(200)
+  //       .map(() => {
+  //         const hey = PIN_MAP[id].value();
+  //         console.log(PIN_MAP, id, hey);
+  //         return hey;
+  //       })
+  //       .map(val => val ? "1" : "0")
+  //       .distinctUntilChanged()
+  //       .map(pinVal => {
+  //         console.log("Pin", id, pinVal);
+  //         return {
+  //           id,
+  //           device: devices.get(id),
+  //           buffer: new Buffer(pinVal)
+  //         }
+  //       })
+  //       .filter(state => state.device !== undefined))
+  //   .map(source => source.subscribe(state => {
+  //     console.log("Going to write to", state.id, state.buffer.toString());
+  //     state.device.write(state.buffer, true, err => {
+  //       if(err) {
+  //         console.log("Error writing to device", state.id, err)
+  //       }
+  //     });
+  //   }));
 
   noble.on('stateChange', function(state) {
     if (state === 'poweredOn') {
