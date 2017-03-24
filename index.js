@@ -69,8 +69,13 @@ function startApp() {
         .filter(state => state.device !== undefined)
     })
     .map(source => source.subscribe(state => {
+      console.log("Is device defined", state.device);
       console.log("Going to write to", state.id, state.buffer.toString());
-      state.device.write(state.buffer, true, err => console.log("Error writing to device", state.id, err));
+      state.device.write(state.buffer, true, err => {
+        if(err) {
+          console.log("Error writing to device", state.id, err)
+        }
+      });
     }));
 
   noble.on('stateChange', function(state) {
