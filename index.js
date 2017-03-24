@@ -57,7 +57,7 @@ function startApp() {
         .interval(50)
         .map(() => PIN_MAP[id].value())
         .map(pinState => state.pinVal ? "1" : "0")
-        .distinctUntilChanged();
+        .distinctUntilChanged()
         .map(pinVal => {
           return {
             device: devices.get(id),
