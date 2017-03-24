@@ -9,7 +9,7 @@ var GPIO = require('pi-pins');
 var exec = require('child_process').exec;
 var util = require('util');
 
-const all = Set(["fff0"]);
+const all = Set(["fff0", "fff1", "fff2"]);
 let connected = Set();
 let devices = Map();
 
@@ -56,22 +56,17 @@ function startApp() {
       return Rx.Observable
         .interval(50)
         .map(() => PIN_MAP[id].value())
+        .map(pinState => state.pinVal ? "1" : "0")
         .distinctUntilChanged();
         .map(pinVal => {
           return {
             device: devices.get(id),
-            pinVal
+            buffer: new Buffer(pinVal)
           }
         })
         .filter(state => state.device !== undefined)
     })
-    .map(source => {
-      return source
-        .subscribe(state => {
-            var code = state.pinVal ? "1" : "0";
-            state.device.write(new Buffer("1"), false, () => {});
-          });
-    });
+    .map(source => source.subscribe(state => state.device.write(state.buffer, false, () => {})));
 
   noble.on('stateChange', function(state) {
     if (state === 'poweredOn') {
