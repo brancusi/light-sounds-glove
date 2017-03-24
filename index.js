@@ -54,8 +54,12 @@ function startApp() {
   const subs = all
     .map(id =>
       Rx.Observable
-        .interval(50)
-        .map(() => PIN_MAP[id].value())
+        .interval(200)
+        .map(() => {
+          const hey = PIN_MAP[id].value();
+          console.log(hey);
+          return hey;
+        })
         .map(val => val ? "1" : "0")
         .distinctUntilChanged()
         .map(pinVal => {
