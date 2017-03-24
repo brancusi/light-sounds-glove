@@ -69,7 +69,7 @@ function startApp() {
     })
     .map(source => source.subscribe(state => {
       console.log("Going to write to", state.id, state.buffer.toString());
-      state.device.write(state.buffer, false, () => {}))
+      state.device.write(state.buffer, false, () => {});
     });
 
   noble.on('stateChange', function(state) {
