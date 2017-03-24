@@ -81,7 +81,7 @@ function startApp() {
       Rx.Observable
         .interval(10000)
         .map(() => R.difference(all, [...connected]))
-        .filter(keys => R.isEmpty(keys))
+        .filter(keys => !R.isEmpty(keys))
         .subscribe(keys => noble.startScanning(keys, true));
     } else {
       noble.stopScanning();
