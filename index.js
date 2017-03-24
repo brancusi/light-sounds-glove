@@ -19,7 +19,7 @@ const DEVICE_PIN_MAP = {
   "fff2": 18
 }
 
-R.forEachObjIndexed((key, val) => {
+R.forEachObjIndexed((val, key) => {
   const pin = GPIO.export(val, {direction: "in"});
 
   console.log("Setting up pin", key, val);
