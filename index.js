@@ -6,16 +6,6 @@ const { Map, Set } = require('immutable');
 var Rx = require('rxjs/Rx');
 var GPIO = require("gpio");
 
-const devicePinMapping = {
-  "fff0": 14,
-  "fff1": 15,
-  "fff2": 18
-}
-
-const pinForDevice1 = GPIO.export(14, {direction: "in"});
-const pinForDevice2 = GPIO.export(15, {direction: "in"});
-const pinForDevice3 = GPIO.export(18, {direction: "in"});
-
 var exec = require('child_process').exec;
 var util = require('util');
 
@@ -23,28 +13,26 @@ const all = Set(["fff0", "fff1", "fff2"]);
 let connected = Set();
 let devices = Map();
 
-// const pinForDevice1 = GPIO.connect(14);
-// pinForDevice1.mode("in");
-//
-// const pinForDevice2 = GPIO.connect(15);
-// pinForDevice2.mode("in");
-//
-// const pinForDevice3 = GPIO.connect(18);
-// pinForDevice3.mode("in");
-
-// const PIN_MAP = {"fff0": pinForDevice1, "fff1": pinForDevice2, "fff2": pinForDevice3};
-
-pinForDevice1.on("change", function(val) {
-  triggerDevice("fff0", val);
-});
-
-function triggerDevice(id, state) {
-  const device = devices.get(id);
-
-  if(device) {
-    device.write(new Buffer(String(state)), true, err => {});
-  }
+const DEVICE_PIN_MAP = {
+  "fff0": 14,
+  "fff1": 15,
+  "fff2": 18
 }
+
+R.forEachObjIndexed((key, val) => {
+  const pin = GPIO.export(val, {direction: "in"});
+
+  console.log("Setting up pin", key, val);
+
+  pin.on("change", function(state) {
+    console.log("Changed", key, val, state);
+    const device = devices.get(key);
+
+    if(device) {
+      device.write(new Buffer(String(state)), true, err => {});
+    }
+  });
+}, DEVICE_PIN_MAP)
 
 function startBluetooth() {
   console.log("Starting bluetooth");

@@ -4,7 +4,6 @@ const R = require('ramda');
 const { Set, Map } = require('immutable');
 
 var Rx = require('rxjs/Rx');
-// var GPIO = require('pi-pins');
 
 var exec = require('child_process').exec;
 var util = require('util');
