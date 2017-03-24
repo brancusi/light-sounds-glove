@@ -1,6 +1,7 @@
 'use strict';
 
 const R = require('ramda');
+const { Set } = require('immutable');
 
 var Rx = require('rxjs/Rx');
 var GPIO = require('pi-pins');
@@ -8,8 +9,8 @@ var GPIO = require('pi-pins');
 var exec = require('child_process').exec;
 var util = require('util');
 
-const all = ["fffffffffffffffffffffffffffffff0"];
-const connected = new Set();
+const all = Set(["fffffffffffffffffffffffffffffff0"]);
+let connected = Set();
 
 function startBluetooth() {
   console.log("Starting bluetooth");
@@ -80,9 +81,11 @@ function startApp() {
 
       Rx.Observable
         .interval(10000)
-        .map(() => R.difference(all, [...connected]))
-        .filter(keys => !R.isEmpty(keys))
-        .subscribe(keys => noble.startScanning(keys, true));
+        .map(() => all.subtract(connected))
+        .filter(keys => !keys.isEmpty())
+        .map(keys => keys.toJS())
+        .do(keys => console.log(keys))
+        .subscribe(jsKeys => noble.startScanning(jsKeys, true));
     } else {
       noble.stopScanning();
     }
@@ -100,7 +103,8 @@ function startApp() {
     console.log('on -> discover: ' + peripheral);
 
     peripheral.on('connect', function() {
-      console.log('on -> connect', peripheral);
+
+      connected = connected.concat(peripheral.advertisment.serviceUuids);
 
       peripheral.discoverServices(["fffffffffffffffffffffffffffffff0"], function(err, services){
         console.log("Discover services");
@@ -119,10 +123,12 @@ function startApp() {
     });
 
     peripheral.on('disconnect', function() {
+      connected = connected.subtract(peripheral.advertisment.serviceUuids);
+
       console.log("disconnected", peripheral);
     });
 
-    // peripheral.connect();
+    peripheral.connect();
   });
 }
 
