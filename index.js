@@ -60,13 +60,17 @@ function startApp() {
         .distinctUntilChanged()
         .map(pinVal => {
           return {
+            id,
             device: devices.get(id),
             buffer: new Buffer(pinVal)
           }
         })
         .filter(state => state.device !== undefined)
     })
-    .map(source => source.subscribe(state => state.device.write(state.buffer, false, () => {})));
+    .map(source => source.subscribe(state => {
+      console.log("Going to write to", state.id, state.buffer.toString());
+      state.device.write(state.buffer, false, () => {}))
+    });
 
   noble.on('stateChange', function(state) {
     if (state === 'poweredOn') {
@@ -95,6 +99,7 @@ function startApp() {
 }
 
 function connectPeripheral(ids, peripheral) {
+  console.log("Connect to ids", ids);
   peripheral.connect((err) => handleConnectedPeripheral(err, ids, peripheral) );
 }
 
@@ -111,6 +116,8 @@ function handleConnectedPeripheral(err, ids, peripheral) {
         });
       }
     });
+  } else {
+    console.log("Error connecting to", ids, err);
   }
 }
 
