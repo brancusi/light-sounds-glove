@@ -27,7 +27,7 @@ const pinsListeners = Object.keys(DEVICE_PIN_MAP)
     return pin.on("change", state => {
       const device = devices.get(key);
 
-      console.log(kye, pinNumber, state);
+      console.log(key, pinNumber, state);
 
       if(device) {
         device.write(new Buffer(String(state)), true);
