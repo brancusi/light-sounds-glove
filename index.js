@@ -21,10 +21,13 @@ const DEVICE_PIN_MAP = {
 
 const pinsListeners = Object.keys(DEVICE_PIN_MAP)
   .map(key => {
-    const pin = GPIO.export(DEVICE_PIN_MAP[key], { direction: "in" });
+    const pinNumber = DEVICE_PIN_MAP[key];
+    const pin = GPIO.export(pinNumber, { direction: "in" });
 
     return pin.on("change", state => {
       const device = devices.get(key);
+
+      console.log(key, pinNumber, state);
 
       if(device) {
         device.write(new Buffer(String(state)), true, err => {});
