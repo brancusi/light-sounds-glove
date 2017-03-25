@@ -22,17 +22,13 @@ const DEVICE_PIN_MAP = {
 const pinsListeners = Object.keys(DEVICE_PIN_MAP)
   .map(key => {
     const pinNumber = DEVICE_PIN_MAP[key];
-    const pin = GPIO.export(pinNumber, { direction: "in", ready: () => console.log("Pin ready", pinNumber, key)});
-
-    console.log(key, pinNumber);
+    const pin = GPIO.export(pinNumber, { direction: "in", interval: 50 });
 
     return pin.on("change", state => {
       const device = devices.get(key);
 
-      console.log(key, pinNumber, state);
-
       if(device) {
-        device.write(new Buffer(String(state)), true, err => {});
+        device.write(new Buffer(String(state)), true);
       }
     });
   });
@@ -63,35 +59,6 @@ function startRadio() {
 
 function startApp() {
   const noble = require('noble');
-
-  // const subs = all
-  //   .map(id =>
-  //     Rx.Observable
-  //       .interval(200)
-  //       .map(() => {
-  //         const hey = PIN_MAP[id].value();
-  //         console.log(PIN_MAP, id, hey);
-  //         return hey;
-  //       })
-  //       .map(val => val ? "1" : "0")
-  //       .distinctUntilChanged()
-  //       .map(pinVal => {
-  //         console.log("Pin", id, pinVal);
-  //         return {
-  //           id,
-  //           device: devices.get(id),
-  //           buffer: new Buffer(pinVal)
-  //         }
-  //       })
-  //       .filter(state => state.device !== undefined))
-  //   .map(source => source.subscribe(state => {
-  //     console.log("Going to write to", state.id, state.buffer.toString());
-  //     state.device.write(state.buffer, true, err => {
-  //       if(err) {
-  //         console.log("Error writing to device", state.id, err)
-  //       }
-  //     });
-  //   }));
 
   noble.on('stateChange', function(state) {
     if (state === 'poweredOn') {
