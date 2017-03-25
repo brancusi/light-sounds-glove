@@ -19,29 +19,20 @@ const DEVICE_PIN_MAP = {
   "fff2": 18
 }
 
-R.forEachObjIndexed((val, key) => {
-  const pin = GPIO.export(val, {
-    direction: "in",
-    ready: () => {
-      console.log("Ready", val, key);
-    },
+const pins = Object.keys(obj)
+  .map(key => GPIO.export(DEVICE_PIN_MAP[key], { direction: "in" }));
 
-    change: (state) => {
-      console.log("!!!!! ", state);
-    }
-  });
+const pinListeners = pins
+  .map(pin => {
+    return pin.on("change", state => {
+      console.log("Changed", key, val, state);
+      const device = devices.get(key);
 
-  console.log("Setting up pin", key, val);
-
-  pin.on("change", state => {
-    console.log("Changed", key, val, state);
-    const device = devices.get(key);
-
-    if(device) {
-      device.write(new Buffer(String(state)), true, err => {});
-    }
-  });
-}, DEVICE_PIN_MAP)
+      if(device) {
+        device.write(new Buffer(String(state)), true, err => {});
+      }
+    });
+  })
 
 function startBluetooth() {
   console.log("Starting bluetooth");
