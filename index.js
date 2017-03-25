@@ -22,7 +22,9 @@ const DEVICE_PIN_MAP = {
 const pinsListeners = Object.keys(DEVICE_PIN_MAP)
   .map(key => {
     const pinNumber = DEVICE_PIN_MAP[key];
-    const pin = GPIO.export(pinNumber, { direction: "in" });
+    const pin = GPIO.export(pinNumber, { direction: "in", ready: () => console.log("Pin ready", pinNumber, key)});
+
+    console.log(key, pinNumber);
 
     return pin.on("change", state => {
       const device = devices.get(key);
