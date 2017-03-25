@@ -14,9 +14,9 @@ let connected = Set();
 let devices = Map();
 
 const DEVICE_PIN_MAP = {
-  "fff0": 14,
-  "fff1": 15,
-  "fff2": 18
+  "fff0": 16,
+  "fff1": 20,
+  "fff2": 21
 }
 
 const pinsListeners = Object.keys(DEVICE_PIN_MAP)
