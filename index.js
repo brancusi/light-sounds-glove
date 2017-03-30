@@ -36,7 +36,6 @@ const pinsListeners = Object.keys(DEVICE_PIN_MAP)
   });
 
 function startBluetooth() {
-  console.log("Starting bluetooth");
   exec("/usr/bin/hciattach /dev/ttyAMA0 bcm43xx 921600 noflow -", function(err, stdout){
     if(err) {
       console.log("Error starting bluetooth");
@@ -48,7 +47,6 @@ function startBluetooth() {
 }
 
 function startRadio() {
-  console.log("Starting Radio");
   exec("hciconfig hci0 up", function(err, stdout1){
     if(err) {
       console.log("Error starting radio");
@@ -89,7 +87,6 @@ function startApp() {
 }
 
 function connectPeripheral(ids, peripheral) {
-  console.log("Connect to ids", ids);
   peripheral.connect(err => {
     if(err) {
       console.log("Error connecting to device", err, ids);
@@ -101,7 +98,6 @@ function connectPeripheral(ids, peripheral) {
 
 function handleConnectedPeripheral(ids, peripheral) {
   connected = connected.concat(ids);
-  console.log(connected.toJS());
 
   peripheral.discoverServices(ids, (err, services) => {
     const service = services[0];
